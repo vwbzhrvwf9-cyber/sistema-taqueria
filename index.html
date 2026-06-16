@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control - Taquería El Lic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* 1. IMPORTACIÓN DE LAS TIPOGRAFÍAS DE LA FOTO */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght=700;900&family=Poppins:wght=400;600;700;900&display=swap');
+
+        /* 2. LOGICA ORIGINAL DE PESTAÑAS Y ALERTAS */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .stock-bajo {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            border: 2px solid rgb(239, 68, 68) !important;
+            color: #FC8181 !important;
+            animation: pulso-alerta 2s infinite;
+        }
+        @keyframes pulso-alerta {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ========================================================
+           DISEÑO OSCURO PREMIUM CON ACABADOS EN ORO GLOW
+           ======================================================== */
+        
+        body {
+            background-color: #0A0A0C !important;
+            font-family: 'Poppins', sans-serif !important;
+            color: #E4E4E7 !important;
+            position: relative;
+        }
+
+        /* Imagen de fondo difuminada como contornos */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('WhatsApp Image 2026-06-15 at 2.16.01 PM.jpeg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            filter: blur(12px) brightness(0.25);
+            opacity: 1.9;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, rgba(20, 20, 25, 0.1) 0%, rgba(5, 5, 8, 0.85) 100%) !important;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        #login-screen, #app-screen {
+            background: transparent !important;
+        }
+
+        /* CONTENEDOR CENTRAL: Acabado Carbón con Borde Dorado */
+        #login-screen > div, main > div, .bg-gray-900, .bg-gray-950\/20, .backdrop-blur-xl {
+            background: rgba(20, 20, 25, 0.85) !important;
+            border: 1px solid rgba(233, 161, 30, 0.25) !important;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), 0 0 25px rgba(233, 161, 30, 0.08) !important;
+            border-radius: 24px !important;
+            backdrop-filter: blur(16px) !important;
+        }
+
+        #login-screen .space-y-2 {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+        }
+
+        /* "TAQUERÍA EL LIC" */
+        #login-screen p.text-gray-400 {
+            order: 1 !important;
+            font-family: 'Cinzel', serif !important;
+            font-size: 1.9rem !important;
+            font-weight: 900 !important;
+            color: #F59E0B !important; 
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin-bottom: 6px !important;
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.2) !important;
+        }
+
+        #login-screen .space-y-2 > div:first-child {
+            order: 2 !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            margin-bottom: 22px !important;
+            position: relative !important;
+        }
+
+        #login-screen .space-y-2 > div:first-child::after {
+            content: "SISTEMA DE CONTROL OPERATIVO" !important;
+            position: absolute !important;
+            bottom: -20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 260px !important;
+            font-family: 'Cinzel', serif !important;
+            font-size: 0.65rem !important;
+            color: #D1D5DB !important;
+            letter-spacing: 1.5px !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+        }
+
+        /* "Control de Taquería" */
+        #login-screen h1 {
+            order: 3 !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 1.25rem !important;
+            color: #E9A11E !important;
+            font-weight: 700 !important;
+            text-transform: none !important;
+            letter-spacing: 0px !important;
+            margin-top: 12px !important;
+        }
+
+        input, select, textarea {
+            background-color: #0C0C0E !important;
+            border: 1px solid rgba(233, 161, 30, 0.2) !important;
+            color: #FFFFFF !important;
+            border-radius: 12px !important;
+            font-family: 'Poppins', sans-serif !important;
+            transition: all 0.2s ease !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #F59E0B !important;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.35) !important;
+        }
+
+        /* ESTILIZACIÓN GLOBAL DE BOTONES */
+        button, button[type="submit"] {
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border-radius: 12px !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* ACABADO ORO EXCLUSIVO PARA LOS BOTONES DE AMBER / PRINCIPALES */
+        button.bg-amber-500, button[type="submit"].bg-amber-500, .bg-amber-500 {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+            color: #000000 !important;
+            border: none !important;
+            box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35) !important;
+        }
+        button.bg-amber-500:hover, button[type="submit"].bg-amber-500:hover {
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.6) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Cabecera del Panel */
+        header {
+            background-color: rgba(12, 12, 15, 0.9) !important;
+            border-bottom: 1px solid rgba(233, 161, 30, 0.15) !important;
+        }
+        header h2 {
+            font-family: 'Cinzel', serif !important;
+            color: #FFFFFF !important;
+        }
+        #user-display { color: #F59E0B !important; }
+
+        /* Navegación */
+        nav {
+            background-color: #0C0C0E !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        .tab-btn { color: #9CA3AF !important; }
+        .tab-btn.border-amber-500, .tab-btn:hover {
+            color: #F59E0B !important;
+            border-bottom-color: #F59E0B !important;
+        }
+
+        th {
+            background-color: #141418 !important;
+            color: #F59E0B !important;
+        }
+        td { border-color: rgba(255, 255, 255, 0.03) !important; }
+    </style>
+</head>
+<body class="antialiased selection:bg-amber-500 selection:text-gray-950">
+
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-sm p-6 text-center space-y-6">
+            <div class="space-y-2">
+                <div class="w-24 h-24 mx-auto flex items-center justify-center">
+                    <img src="WhatsApp Image 2026-06-15 at 2.16.01 PM.jpeg" alt="Taco Pulgar Arriba" class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
+                </div>
+                <h1 class="text-xl font-black tracking-tight text-white uppercase">Control de Taquería</h1>
+                <p class="text-gray-400 text-xs font-medium">Taquería El Lic</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); login();" class="space-y-4 text-left">
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5 text-amber-500"></i> Selecciona tu Perfil</label>
+                    <select id="login-user" class="w-full p-3 bg-gray-950 border border-gray-800 rounded-xl text-xs text-white font-bold focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-none">
+                        <option value="Camila">Camila</option>
+                        <option value="Catalina">Catalina</option>
+                        <option value="Octavio">Octavio</option>
+                        <option value="Ivan">Ivan</option>
+                        <option value="Jefe">Jefe / Administrador</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5 text-amber-500"></i> PIN de Seguridad</label>
+                    <input type="password" id="login-pin" maxlength="4" placeholder="••••" inputmode="numeric" class="w-full p-3 bg-gray-950 border border-gray-800 rounded-xl text-center text-lg font-black tracking-widest text-white placeholder-gray-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-none">
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 text-gray-950 font-black p-3.5 rounded-xl shadow-xl transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-1.5">
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Acceder al Tablero
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-screen" class="min-h-screen flex flex-col hidden">
+        <header class="sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-gray-950 font-black text-sm shadow shadow-amber-500/20">TL</div>
+                <div>
+                    <h2 class="text-xs font-black text-white tracking-wide uppercase leading-none">Taquería El Lic</h2>
+                    <span id="user-display" class="text-[10px] font-bold block mt-0.5">Usuario: -</span>
+                </div>
+            </div>
+            <button onclick="logout()" class="p-2 bg-gray-800 hover:bg-rose-950/40 border border-gray-700 hover:border-rose-500/30 text-gray-400 hover:text-rose-400 p-2 text-xs font-bold flex items-center gap-1">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Salir
+            </button>
+        </header>
+
+        <nav class="px-2 flex justify-between overflow-x-auto gap-1 scrollbar-none shrink-0">
+            <button id="btn-tab-asistencia" onclick="switchTab('tab-asistencia')" class="tab-btn py-3 px-3 border-b-2 font-black text-[11px] tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-all border-amber-500 text-amber-500"><i data-lucide="clock" class="w-4 h-4"></i> Asistencia</button>
+            <button id="btn-tab-mesero" onclick="switchTab('tab-mesero')" class="tab-btn py-3 px-3 border-b-2 font-black text-[11px] tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-all border-transparent text-gray-400"><i data-lucide="utensils" class="w-4 h-4"></i> Comandas</button>
+            <button id="btn-tab-inventario" onclick="switchTab('tab-inventario')" class="tab-btn py-3 px-3 border-b-2 font-black text-[11px] tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-all border-transparent text-gray-400"><i data-lucide="boxes" class="w-4 h-4"></i> Inventario</button>
+            <button id="btn-tab-caja" onclick="switchTab('tab-caja')" class="tab-btn py-3 px-3 border-b-2 font-black text-[11px] tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-all border-transparent text-gray-400"><i data-lucide="wallet" class="w-4 h-4"></i> Caja Manual</button>
+            <button id="btn-tab-chat" onclick="switchTab('tab-chat')" class="tab-btn py-3 px-3 border-b-2 font-black text-[11px] tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-all border-transparent text-gray-400"><i data-lucide="messages-square" class="w-4 h-4"></i> Equipo</button>
+            <button id="btn-tab-jefe" onclick="switchTab('tab-jefe')" class="tab-btn py-3 px-3 border-b-2 font-black text-[11px] tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-all border-transparent text-gray-400 hidden"><i data-lucide="shield" class="w-4 h-4"></i> Panel Jefe</button>
+        </nav>
+
+        <main class="flex-1 p-4 max-w-4xl w-full mx-auto overflow-y-auto">
+            
+            <section id="tab-asistencia" class="tab-content active space-y-4">
+                <div id="asistencia-empleados" class="space-y-4 hidden">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-5 space-y-4">
+                            <h2 class="text-sm font-black uppercase tracking-wider border-b border-gray-800 pb-2 flex items-center gap-1.5 text-emerald-400"><i data-lucide="play-circle" class="w-4 h-4"></i> Inicio de Asistencia</h2>
+                            
+                            <div class="space-y-2">
+                                <label class="block text-[10px] text-gray-400 font-bold uppercase tracking-wider">Fotografía de Evidencia Obligatoria:</label>
+                                <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-gray-800 shadow-inner flex items-center justify-center">
+                                    <video id="video-camara" autoplay playsinline class="w-full h-full object-cover"></video>
+                                    <img id="img-preview" class="w-full h-full object-cover hidden" alt="Evidencia capturada">
+                                    <canvas id="canvas-foto" class="hidden"></canvas>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="capturarFoto()" class="flex-1 p-2 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs flex items-center justify-center gap-1"><i data-lucide="camera" class="w-3.5 h-3.5 text-amber-500"></i> Tomar Foto</button>
+                                    <button type="button" id="btn-recapturar" onclick="reintentarFoto()" class="p-2 bg-rose-950/50 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 font-bold text-xs hidden"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reintentar</button>
+                                </div>
+                            </div>
+
+                            <form id="form-entrada" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                                <div>
+                                    <label class="block text-gray-400 font-bold mb-1">Puesto Asignado:</label>
+                                    <select id="asist-puesto" class="w-full p-2 bg-gray-800 text-white font-bold">
+                                        <option value="Taquero">Taquero</option>
+                                        <option value="Mesero">Mesero</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-gray-400 font-bold mb-1">Fondo de Caja Recibido ($):</label>
+                                        <input type="number" id="asist-dinero-in" placeholder="0.00" class="w-full p-2 bg-gray-800 text-white font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-400 font-bold mb-1">Dinero Propio al Entrar ($):</label>
+                                        <input type="number" id="asist-dinero-propio" placeholder="0.00" class="w-full p-2 bg-gray-800 text-white font-bold">
+                                    </div>
+                                </div>
+                                <button type="button" onclick="registrarEntradaEmpleado(event)" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black p-3 rounded-xl shadow-lg transition tracking-wide uppercase text-xs">Registrar Entrada Oficial</button>
+                            </form>
+                        </div>
+
+                        <div class="p-5 space-y-4 flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <h2 class="text-sm font-black uppercase tracking-wider border-b border-gray-800 pb-2 flex items-center gap-1.5 text-rose-400"><i data-lucide="stop-circle" class="w-4 h-4"></i> Fin de Asistencia y Arqueo</h2>
+                                <form id="form-salida" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                                    <div>
+                                        <label class="block text-gray-400 font-bold mb-1">Fondo de Caja Final Dejado ($):</label>
+                                        <input type="number" id="asist-dinero-out" placeholder="Ej. 1000.00" class="w-full p-2 bg-gray-800 text-white font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-400 font-bold mb-1 text-amber-400">Venta Total Recaudada ($):</label>
+                                        <input type="number" id="asist-venta-caja" placeholder="Efectivo + Tarjetas sumadas" class="w-full p-2 bg-amber-950/20 border border-amber-500/30 text-amber-300 font-black text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-400 font-bold mb-1">Dinero Propio al Salir ($):</label>
+                                        <input type="number" id="asist-dinero-propio-out" placeholder="0.00" class="w-full p-2 bg-gray-800 text-white font-bold">
+                                    </div>
+                                </form>
+                            </div>
+                            <button type="button" onclick="registrarSalidaEmpleado(event)" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black p-3 rounded-xl shadow-lg transition tracking-wide uppercase text-xs mt-4">Registrar Salida y Enviar Reporte</button>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-500"></i> Tu Registro de Asistencia Mensual</h3>
+                        <div id="calendario-empleado" class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold max-w-xs bg-gray-950 p-3 rounded-xl border border-gray-800"></div>
+                    </div>
+                </div>
+
+                <div id="asistencia-jefe" class="p-6 text-center max-w-sm mx-auto space-y-3 hidden">
+                    <div class="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto text-amber-500"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
+                    <h3 class="text-sm font-bold text-white">Perfil Administrativo Activo</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Como Jefe no registras asistencia operativa de entrada o salida. Ve al <span class="text-amber-500 font-bold">Panel Jefe</span> en el menú superior para auditar las marcas de tiempo.</p>
+                </div>
+            </section>
+
+            <section id="tab-mesero" class="tab-content space-y-4">
+                <div class="p-4 max-w-xl mx-auto space-y-4">
+                    <div class="border-b border-gray-800 pb-2">
+                        <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="layout-grid" class="w-4 h-4 text-amber-500"></i> Selección de Mesa o Pedido</h2>
+                        <p class="text-[10px] text-gray-400 font-medium">Los productos se quedan memorizados individualmente en cada casilla.</p>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-1.5 text-[11px] font-black uppercase">
+                        <button onclick="seleccionarMesa('Mesa 1')" id="btn-mesa-Mesa-1" class="mesa-btn p-2 rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-500 transition-all">Mesa 1</button>
+                        <button onclick="seleccionarMesa('Mesa 2')" id="btn-mesa-Mesa-2" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all">Mesa 2</button>
+                        <button onclick="seleccionarMesa('Mesa 3')" id="btn-mesa-Mesa-3" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all">Mesa 3</button>
+                        <button onclick="seleccionarMesa('Mesa 4')" id="btn-mesa-Mesa-4" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all">Mesa 4</button>
+                        <button onclick="seleccionarMesa('Mesa 5')" id="btn-mesa-Mesa-5" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all">Mesa 5</button>
+                        <button onclick="seleccionarMesa('Llevar 1')" id="btn-mesa-Llevar-1" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all col-span-1">Llevar 1</button>
+                        <button onclick="seleccionarMesa('Llevar 2')" id="btn-mesa-Llevar-2" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all col-span-1">Llevar 2</button>
+                        <button onclick="seleccionarMesa('Llevar 3')" id="btn-mesa-Llevar-3" class="mesa-btn p-2 rounded-xl border border-gray-800 bg-gray-950 text-gray-400 transition-all col-span-1">Llevar 3</button>
+                    </div>
+
+                    <div class="bg-gray-950 p-3 rounded-xl border border-gray-800/80 flex items-center justify-between text-xs">
+                        <span class="text-gray-400 font-bold">Atendiendo casilla actual: <span id="lbl-mesa-activa" class="text-amber-500 font-black px-1.5 py-0.5 bg-amber-500/10 rounded border border-amber-500/20">Mesa 1</span></span>
+                        <span id="lbl-quien-comanda" class="text-[10px] text-gray-500 font-black uppercase"></span>
+                    </div>
+
+                    <form id="form-mesero" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-1">Selecciona Alimento / Bebida:</label>
+                            <select id="mesero-producto" class="w-full p-2.5 bg-gray-800 text-white font-bold text-xs">
+                                <optgroup label="🥤 Refrescos y Bebidas">
+                                    <option value="Corona Light" data-precio="35">Corona Light ($35.00)</option>
+                                    <option value="Modelo Especial" data-precio="35">Modelo Especial ($35.00)</option>
+                                    <option value="Fanta" data-precio="22">Fanta ($22.00)</option>
+                                    <option value="Sidral" data-precio="22">Sidral ($22.00)</option>
+                                    <option value="Mirinda" data-precio="22">Mirinda ($22.00)</option>
+                                    <option value="7Up" data-precio="22">7Up ($22.00)</option>
+                                    <option value="Coca de Lata" data-precio="30">Coca de Lata ($30.00)</option>      
+                                    <option value="Coca Tapa Rosca" data-precio="22">Coca Tapa Rosca ($22.00)</option>
+                                    <option value="Sangría" data-precio="30">Sangría ($30.00)</option>
+                                    <option value="Topo Chico" data-precio="30">Topo Chico ($30.00)</option>
+                                    <option value="Agua Embotellada" data-precio="20">Agua Embotellada ($20.00)</option>
+                                    <option value="Agua Fresca de Sabor" data-precio="15">Agua Fresca Sabor Vaso ($15.00)</option>
+                                </optgroup>
+                                <optgroup label="🌮 Órdenes de Comida">
+                                    <option value="Tacos de pastor (2x1)" data-precio="20">Tacos de pastor (2x1) ($20.00)</option>
+                                    <option value="Taco de carnes" data-precio="20">Taco de Carnes ($20.00)</option>
+                                    <option value="Gringa de Carne" data-precio="65">Gringa de Carne ($65.00)</option>
+                                    <option value="Quesadilla Harina/sencilla" data-precio="32">Quesadilla Harina/sencilla ($32.00)</option>
+                                    <option value="Volcán con Carne" data-precio="35">Volcán con Carne ($35.00)</option>
+                                    <option value="Quesadilla Harina/con carne" data-precio="45">Quesadilla Harina/con carne ($45.00)</option>
+                                    <option value="Burrito de Carne/sencillo" data-precio="95">Burrito de Carne/sencillo ($95.00)</option> 
+                                    <option value="Burrito de Carne/con queso" data-precio="120">Burrito de Carne/con queso ($120.00)</option>
+                                    <option value="Burrito de Pastor/con queso" data-precio="105">Burrito de Pastor/con queso ($105.00)</option>
+                                    <option value="Burrito de pastor/sencillo" data-precio="90">Burrito de pastor/sencillo ($90.00)</option>
+                                    <option value="Chavindeca" data-precio="65">Chavindeca ($65.00)</option>
+                                    <option value="Hamburguesa/sencilla" data-precio="95">Hamburguesa/sencilla ($95.00)</option> 
+                                    <option value="Hamburguesa/condenada" data-precio="135">Hamburguesa/condenada ($135.00)</option>
+                                </optgroup>
+                                <optgroup label="🍽️ Órdenes X kilo">
+                                    <option value="Kilo de pastor" data-precio="410">Kilo de pastor ($410.00)</option>
+                                    <option value="Medio Kilo" data-precio="230">Medio Kilo ($230.00)</option>
+                                    <option value="Platillo Bistec/pastor" data-precio="160">Platillo Bistec/pastor ($160.00)</option>
+                                    <option value="Orden de cebollas" data-precio="25">Orden de cebollas ($25.00)</option>
+                                    <option value="Orden de tostadas" data-precio="30">Orden de tostadas ($30.00)</option>
+                                    <option value="Bolsa extra de salsas" data-precio="10">Bolsa extra de salsas ($10.00)</option>
+                                 </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <div class="w-1/3">
+                                <label class="block text-gray-400 font-bold mb-1">Cantidad:</label>
+                                <input type="number" id="mesero-cantidad" value="1" min="1" class="w-full p-2 bg-gray-800 text-white font-bold">
+                            </div>
+                            <div class="w-2/3 flex items-end">
+                                <button type="button" onclick="agregarProductoAMesa()" class="w-full bg-gray-800 border border-gray-700 text-white font-black p-2 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-1">
+                                    <i data-lucide="plus" class="w-4 h-4 text-amber-500"></i> Añadir a la lista
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800/80 space-y-2">
+                            <span class="text-[10px] uppercase font-black tracking-wider text-gray-400 block border-b border-gray-800 pb-1">Productos Cargados en la cuenta:</span>
+                            <div id="lista-productos-mesa" class="space-y-1.5 max-h-36 overflow-y-auto text-[11px]"></div>
+                        </div>
+
+                        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 flex items-center justify-between">
+                            <span class="text-[10px] uppercase font-black tracking-wider text-gray-400">Método de Pago Final:</span>
+                            <div class="flex gap-4 font-bold text-white">
+                                <label class="flex items-center gap-1.5"><input type="radio" name="mesero-pago" value="Efectivo" checked class="accent-amber-500"> 💵 Efectivo</label>
+                                <label class="flex items-center gap-1.5"><input type="radio" name="mesero-pago" value="Tarjeta" class="accent-amber-500"> 💳 Tarjeta</label>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex justify-between items-center">
+                            <span class="font-bold text-amber-500 uppercase tracking-wider">Total Acumulado:</span>
+                            <span id="mesero-total-display" class="text-xl font-black text-amber-400">$0.00</span>
+                        </div>
+
+                        <button type="button" onclick="registrarVentaMesero(event)" class="w-full bg-amber-500 text-gray-950 font-black p-3.5 rounded-xl shadow uppercase tracking-wider text-xs">🚀 Cobrar Cuenta e Inyectar a Caja</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="tab-inventario" class="tab-content space-y-4">
+                <div class="p-5">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-4">
+                        <div>
+                            <h2 class="text-sm font-black text-white uppercase tracking-wider">Inventario Centralizado</h2>
+                            <p class="text-[10px] text-gray-400 mt-0.5 font-medium">Los insumos con menos de 2 unidades parpadearán en rojo automáticamente.</p>
+                        </div>
+                        <i data-lucide="package" class="w-5 h-5 text-amber-500"></i>
+                    </div>
+
+                    <form id="form-inventario" class="space-y-6" onsubmit="event.preventDefault();">
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-black text-amber-500 uppercase tracking-widest bg-gray-950 p-1.5 px-2.5 rounded-lg border border-gray-800/60">🥤 Bebidas y Almacén de Líquidos (Piezas)</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Corona Light</label><input type="number" id="inv-coronalight" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Modelo Especial</label><input type="number" id="inv-modeloespecial" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Fanta</label><input type="number" id="inv-fanta" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Sidral</label><input type="number" id="inv-sidral" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Mirinda</label><input type="number" id="inv-miranda" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">7Up</label><input type="number" id="inv-7up" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Coca Lata</label><input type="number" id="inv-cocalata" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Coca Tapa Rosca</label><input type="number" id="inv-cocatarosca" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Sangría</label><input type="number" id="inv-sangria" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Topo Chico</label><input type="number" id="inv-topochico" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Agua Botella</label><input type="number" id="inv-aguaembotellada" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Agua Sabor (L)</label><input type="number" id="inv-aguasabor" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-black text-amber-500 uppercase tracking-widest bg-gray-950 p-1.5 px-2.5 rounded-lg border border-gray-800/60">🥩 Carnes y Masas Crudas (Kilogramos)</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Bistec (kg)</label><input type="number" step="0.1" id="inv-bistec" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Suadero (kg)</label><input type="number" step="0.1" id="inv-suadero" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Chorizo (kg)</label><input type="number" step="0.1" id="inv-chorizo" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Tripa (kg)</label><input type="number" step="0.1" id="inv-tripa" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Pastor (kg)</label><input type="number" step="0.1" id="inv-pastor" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Tortilla Maíz (kg)</label><input type="number" step="0.1" id="inv-tmaiz" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Tortilla Harina (kg)</label><input type="number" step="0.1" id="inv-tharina" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-black text-amber-500 uppercase tracking-widest bg-gray-950 p-1.5 px-2.5 rounded-lg border border-gray-800/60">📦 Desechables e Insumos Operativos</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Bolsa para Agua</label><input type="number" id="inv-bolsaagua" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Popote</label><input type="number" id="inv-popote" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Bolsa Asa Grande</label><input type="number" id="inv-asagrande" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Bolsa Asa Chica</label><input type="number" id="inv-asachica" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Bolsa Jumbo</label><input type="number" id="inv-bolsajumbo" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Plato Chico</label><input type="number" id="inv-platoch" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Plato Grande</label><input type="number" id="inv-platogde" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Charola Grande</label><input type="number" id="inv-charolagde" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Vaso Grande</label><input type="number" id="inv-vasogde" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Servilletas</label><input type="number" id="inv-servilletas" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Papel Aluminio</label><input type="number" id="inv-aluminio" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Bolsas p/ salsa</label><input type="number" id="inv-bolsasalsa" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-black text-amber-500 uppercase tracking-widest bg-gray-950 p-1.5 px-2.5 rounded-lg border border-gray-800/60">✨ Sección (Otros)</h3>
+                            
+                            <div class="space-y-1">
+                                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase block">🧪 Medición Por Litro (L)</span>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-xs">
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Jabón p/ manos</label><input type="number" step="0.1" id="inv-jabonmanos" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Jabón p/ platos</label><input type="number" step="0.1" id="inv-jabonplatos" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Cloro</label><input type="number" step="0.1" id="inv-cloro" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Vinagre</label><input type="number" step="0.1" id="inv-vinagre" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Aceite / Manteca</label><input type="number" step="0.1" id="inv-aceitemanteca" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <span class="text-[10px] text-gray-400 font-black tracking-wider uppercase block">⚖️ Medición Por Kilogramo (kg)</span>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Azúcar</label><input type="number" step="0.1" id="inv-azucar" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Sal</label><input type="number" step="0.1" id="inv-sal" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                    <div><label class="block text-[10px] text-gray-400 font-bold mb-1">Limón</label><input type="number" step="0.1" id="inv-limon" value="0" class="w-full p-2 bg-gray-800 text-white font-bold transition-all"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="guardarInventarioCompartido(event)" class="w-full bg-amber-500 text-gray-950 font-black p-3 rounded-xl shadow">💾 Guardar Actualización Global</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="tab-caja" class="tab-content space-y-4">
+                <div class="p-5">
+                    <h2 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Movimientos de Caja Manuales</h2>
+                    <form id="form-caja" class="space-y-4 text-xs" onsubmit="event.preventDefault();">
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-1">Tipo de Operación:</label>
+                            <select id="caja-tipo" class="w-full p-2.5 bg-gray-800 text-white font-bold">
+                                <option value="Ingreso">📈 Ingreso Extra de Efectivo</option>
+                                <option value="Egreso">📉 Egreso (Pago a Proveedor / Gasto)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-1">Monto de dinero ($):</label>
+                            <input type="number" step="0.01" id="caja-monto" placeholder="0.00" class="w-full p-2.5 bg-gray-800 text-white font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 font-bold mb-1">Concepto Justificado:</label>
+                            <input type="text" id="caja-concepto" placeholder="Ej. Compra de cilantro y limones" class="w-full p-2.5 bg-gray-800 text-white">
+                        </div>
+                        <button type="button" onclick="guardarFinanzas(event)" class="w-full bg-amber-500 text-gray-950 font-black p-3 rounded-xl shadow">Registrar en Caja</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="tab-chat" class="tab-content space-y-4">
+                <div class="p-4 flex flex-col h-[480px]">
+                    <h2 class="text-base font-bold text-white border-b border-gray-800 pb-2 mb-2 flex items-center gap-1.5"><i data-lucide="messages-square" class="w-5 h-5 text-amber-500"></i> Mensajería del Equipo</h2>
+                    
+                    <div class="bg-red-950/30 border border-red-500/20 p-2.5 rounded-xl mb-3 flex items-center justify-between gap-2 text-xs">
+                        <span class="font-black text-red-400 shrink-0">🚨 Reportar Faltante:</span>
+                        <select id="chat-producto-alerta" class="p-1 bg-gray-800 text-white rounded text-[11px] w-full max-w-[140px]">
+                            <optgroup label="📦 Desechables / Insumos">
+                                <option value="Bolsa para Agua">Bolsa para Agua</option>
+                                <option value="Popote">Popote</option>
+                                <option value="Bolsa Asa Grande">Bolsa Asa Grande</option>
+                                <option value="Bolsa Asa Chica">Bolsa Asa Chica</option>
+                                <option value="Bolsa Jumbo">Bolsa Jumbo</option>
+                                <option value="Plato Chico">Plato Chico</option>
+                                <option value="Plato Grande">Plato Grande</option>
+                                <option value="Charola Grande">Charola Grande</option>
+                                <option value="Vaso Grande">Vaso Grande</option>
+                                <option value="Servilletas">Servilletas</option>
+                            </optgroup>
+                            <optgroup label="🧪 Otros (Litros)">
+                                <option value="Jabón para manos">Jabón para manos</option>
+                                <option value="Jabón para platos">Jabón para platos</option>
+                                <option value="Cloro">Cloro</option>
+                                <option value="Vinagre">Vinagre</option>
+                                <option value="Aceite/Manteca">Aceite/Manteca</option>
+                            </optgroup>
+                            <optgroup label="⚖️ Otros (Kilogramos)">
+                                <option value="Azúcar">Azúcar</option>
+                                <option value="Sal">Sal</option>
+                                <option value="Limón">Limón</option>
+                            </optgroup>
+                        </select>
+                        <button onclick="enviarAlertaAgotado()" class="bg-red-600 hover:bg-red-500 text-white font-black px-3 py-1.5 rounded-lg transition text-[11px]">ALERTAR</button>
+                    </div>
+
+                    <div id="chat-contenedor" class="flex-1 overflow-y-auto space-y-2 p-2 bg-gray-950 rounded-xl mb-3 text-xs"></div>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="chat-mensaje" placeholder="Escribe un mensaje al equipo..." class="flex-1 p-2.5 bg-gray-800 border border-gray-700 rounded-xl text-xs text-white">
+                        <button onclick="enviarMensajeTexto()" class="bg-amber-500 text-gray-950 font-black px-5 rounded-xl text-xs transition">Enviar</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-jefe" class="tab-content space-y-4">
+                <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
+                    <div class="p-3 bg-emerald-950/30 border border-emerald-500/20 rounded-xl"><h3 class="text-gray-400 uppercase text-[9px]">Ingresos</h3><p id="total-ingresos" class="text-lg font-black text-emerald-400">$0.00</p></div>
+                    <div class="p-3 bg-rose-950/30 border border-rose-500/20 rounded-xl"><h3 class="text-gray-400 uppercase text-[9px]">Egresos</h3><p id="total-egresos" class="text-lg font-black text-rose-400">$0.00</p></div>
+                    <div class="p-3 bg-amber-950/30 border border-amber-500/20 rounded-xl"><h3 class="text-gray-400 uppercase text-[9px]">Flujo Neto</h3><p id="total-neto" class="text-lg font-black text-amber-500">$0.00</p></div>
+                </div>
+
+                <div class="p-4 space-y-3">
+                    <h3 class="text-sm font-black text-amber-500 flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-4 h-4"></i> Auditoría de Asistencia</h3>
+                    <div class="flex gap-2 items-center text-xs">
+                        <label class="text-gray-400">Ver Calendario de:</label>
+                        <select id="jefe-filtro-empleado" onchange="cargarCalendarioJefe()" class="p-2 bg-gray-800 text-white font-bold">
+                            <option value="Camila">Camila</option>
+                            <option value="Catalina">Catalina</option>
+                            <option value="Octavio">Octavio</option>
+                            <option value="Ivan">Ivan</option>
+                        </select>
+                    </div>
+                    <div id="calendario-jefe" class="grid grid-cols-7 gap-2 text-center text-xs max-w-xs mx-auto bg-gray-950 p-4 rounded-xl border border-gray-800"></div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
+                        <h3 class="font-bold text-white text-sm">📋 Actividades y Control de Evidencia</h3>
+                        <button onclick="ejecutarBorradoMaestro()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-3 py-1.5 rounded-xl transition">🧹 REINICIAR SISTEMA</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-[11px]">
+                            <thead>
+                                <tr class="bg-gray-950 text-gray-400 uppercase font-black tracking-wider border-b border-gray-800">
+                                    <th class="p-2.5">Fecha y Hora</th>
+                                    <th class="p-2.5">Quién</th>
+                                    <th class="p-2.5">Acción</th>
+                                    <th class="p-2.5">Evidencia Foto / Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-logs" class="divide-y divide-gray-800"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, getDocs, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr5RMeoztUkv6D_uxOkzf_QGUvJ3ZNzRQ",
+            authDomain: "control-de-taqueria.firebaseapp.com",
+            projectId: "control-de-taqueria",
+            storageBucket: "control-de-taqueria.firebasestorage.app",
+            messagingSenderId: "966414795111",
+            appId: "1:966414795111:web:5bf84fcd18098de9742fc2",
+            measurementId: "G-M1LMW1D3QP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const USUARIOS_PIN = {
+            "Camila": "7492",
+            "Catalina": "3815",
+            "Octavio": "9264",
+            "Ivan": "5138",
+            "Jefe": "8841"
+        };
+
+        let usuarioActivo = null;
+        let streamCamara = null;
+        let fotoCapturadaBase64 = null;
+        let turnoIniciadoActivo = false; 
+        let dineroPropioEntradaGlobal = 0;
+
+        let mesaSeleccionada = "Mesa 1";
+        const comandasPorMesa = {
+            "Mesa 1": [], "Mesa 2": [], "Mesa 3": [], "Mesa 4": [], "Mesa 5": [],
+            "Llevar 1": [], "Llevar 2": [], "Llevar 3": []
+        };
+
+        function refrescarIconos() {
+            if (window.lucide) { window.lucide.createIcons(); }
+        }
+
+        window.login = function() {
+            const user = document.getElementById("login-user").value;
+            const pin = document.getElementById("login-pin").value;
+
+            if (USUARIOS_PIN[user] === pin) {
+                usuarioActivo = user;
+                turnoIniciadoActivo = false; 
+                document.getElementById("login-screen").classList.add("hidden");
+                document.getElementById("app-screen").classList.remove("hidden");
+                document.getElementById("user-display").innerText = `Usuario: ${usuarioActivo}`;
+                document.getElementById("lbl-quien-comanda").innerText = `Operador: ${usuarioActivo}`;
+                
+                const btnJefe = document.getElementById("btn-tab-jefe");
+                if(usuarioActivo === "Jefe") {
+                    btnJefe.classList.remove("hidden");
+                    document.getElementById("asistencia-empleados").classList.add("hidden");
+                    document.getElementById("asistencia-jefe").classList.remove("hidden");
+                } else {
+                    btnJefe.classList.add("hidden");
+                    document.getElementById("asistencia-empleados").classList.remove("hidden");
+                    document.getElementById("asistencia-jefe").classList.add("hidden");
+                    encenderCamara();
+                }
+
+                document.getElementById("login-pin").value = "";
+                switchTab('tab-asistencia');
+                inicializarListenersRealtime();
+                verificarYLimpiarMesCalendario();
+                generarCalendarioLocal("calendario-empleado");
+            } else {
+                alert("❌ PIN Incorrecto. Inténtalo de nuevo.");
+            }
+        };
+
+        window.logout = function() {
+            if (usuarioActivo !== "Jefe" && turnoIniciadoActivo) {
+                alert("⚠️ ATENCIÓN: No puedes cerrar sesión sin antes registrar tu Salida.");
+                return;
+            }
+            apagarCamara();
+            usuarioActivo = null;
+            document.getElementById("app-screen").classList.add("hidden");
+            document.getElementById("login-screen").classList.remove("hidden");
+        };
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'text-amber-500');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-transparent', 'text-gray-400');
+                activeBtn.classList.add('border-amber-500', 'text-amber-500');
+            }
+
+            if (tabId === 'tab-asistencia' && usuarioActivo !== "Jefe") {
+                encenderCamara();
+            } else {
+                apagarCamara();
+            }
+
+            if(tabId === 'tab-jefe' && usuarioActivo === 'Jefe') {
+                cargarCalendarioJefe();
+            }
+            if(tabId === 'tab-mesero') {
+                renderizarCarritoMesa();
+            }
+        };
+
+        window.addEventListener('beforeunload', (event) => {
+            if (usuarioActivo && usuarioActivo !== "Jefe" && turnoIniciadoActivo) {
+                event.preventDefault();
+                event.returnValue = "⚠️ Tienes una sesión activa. Debes registrar tu Salida antes de cerrar la página.";
+            }
+        });
+
+        async function encenderCamara() {
+            if (streamCamara && streamCamara.active) return;
+            const video = document.getElementById("video-camara");
+            try {
+                streamCamara = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, 
+                    audio: false 
+                });
+                video.srcObject = streamCamara;
+                video.play();
+            } catch (err) {
+                console.error("Error accediendo a la cámara: ", err);
+                alert("⚠️ No se pudo desplegar la cámara. Otorga los permisos correspondientes en tu navegador.");
+            }
+        }
+
+        function apagarCamara() {
+            if (streamCamara) {
+                streamCamara.getTracks().forEach(track => track.stop());
+                streamCamara = null;
+            }
+        }
+
+        window.capturarFoto = function() {
+            const video = document.getElementById("video-camara");
+            const canvas = document.getElementById("canvas-foto");
+            const imgPreview = document.getElementById("img-preview");
+            const btnRecapturar = document.getElementById("btn-recapturar");
+
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 240;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            fotoCapturadaBase64 = canvas.toDataURL("image/jpeg", 0.7);
+            imgPreview.src = fotoCapturadaBase64;
+            
+            video.classList.add("hidden");
+            imgPreview.classList.remove("hidden");
+            btnRecapturar.classList.remove("hidden");
+        };
+
+        window.reintentarFoto = function() {
+            document.getElementById("video-camara").classList.remove("hidden");
+            document.getElementById("img-preview").classList.add("hidden");
+            document.getElementById("btn-recapturar").classList.add("hidden");
+            fotoCapturadaBase64 = null;
+        };
+
+        window.registrarEntradaEmpleado = async function(evt) {
+            const btn = evt?.currentTarget;
+            if (!fotoCapturadaBase64) {
+                alert("❌ ERROR OBLIGATORIO: Debes tomarte la foto de evidencia antes de iniciar.");
+                return;
+            }
+            const puesto = document.getElementById("asist-puesto").value;
+            const cajaIn = document.getElementById("asist-dinero-in").value || "0";
+            const propioIn = document.getElementById("asist-dinero-propio").value || "0";
+            dineroPropioEntradaGlobal = parseFloat(propioIn);
+
+            try {
+                if (btn) { btn.disabled = true; btn.innerText = "⏳ Guardando..."; }
+                await addDoc(collection(db, "logs"), {
+                    fecha: new Date().toLocaleString("es-MX", { hour12: false }), 
+                    quien: usuarioActivo,
+                    accion: `Entrada - Puesto: ${puesto}`,
+                    evidencia: `Fondo Caja: $${cajaIn} | Dinero Propio: $${propioIn}`,
+                    foto: fotoCapturadaBase64,
+                    propioEntrada: dineroPropioEntradaGlobal,
+                    propioSalida: 0,
+                    alertaPropio: false
+                });
+
+                const hoyStr = new Date().getDate().toString();
+                await setDoc(doc(db, "asistencia", `${usuarioActivo}_${hoyStr}`), {
+                    usuario: usuarioActivo,
+                    dia: hoyStr,
+                    mesAño: `${new Date().getMonth()}-${new Date().getFullYear()}`
+                });
+
+                turnoIniciadoActivo = true;
+                alert("🚀 Entrada registrada exitosamente.");
+                reintentarFoto();
+            } catch (e) {
+                alert("Error al conectar con la base de datos.");
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = "Registrar Entrada Oficial"; }
+            }
+        };
+
+        window.registrarSalidaEmpleado = async function(evt) {
+            const btn = evt?.currentTarget;
+            if(!turnoIniciadoActivo) {
+                alert("⚠️ No tienes ninguna entrada registrada en esta sesión.");
+                return;
+            }
+            const cajaOut = document.getElementById("asist-dinero-out").value || "0";
+            const ventaCaja = document.getElementById("asist-venta-caja").value || "0";
+            const propioOut = document.getElementById("asist-dinero-propio-out").value || "0";
+            const dineroPropioSalidaNum = parseFloat(propioOut);
+
+            const esAlertaDinero = dineroPropioSalidaNum > dineroPropioEntradaGlobal;
+
+            try {
+                if (btn) { btn.disabled = true; btn.innerText = "⏳ Sincronizando..."; }
+                await addDoc(collection(db, "logs"), {
+                    fecha: new Date().toLocaleString("es-MX", { hour12: false }), 
+                    quien: usuarioActivo,
+                    accion: "Salida",
+                    evidencia: `Caja final: $${cajaOut} | Ventas: $${ventaCaja} | Propio: $${propioOut}`,
+                    foto: "",
+                    propioEntrada: dineroPropioEntradaGlobal,
+                    propioSalida: dineroPropioSalidaNum,
+                    alertaPropio: esAlertaDinero
+                });
+
+                if(parseFloat(ventaCaja) > 0) {
+                    await addDoc(collection(db, "finanzas"), {
+                        monto: parseFloat(ventaCaja),
+                        tipo: "Ingreso",
+                        concepto: `Venta Registrada por ${usuarioActivo}`,
+                        fecha: new Date().getTime()
+                    });
+                }
+
+                turnoIniciadoActivo = false;
+                alert("🛑 Salida grabada exitosamente.");
+                
+                document.getElementById("asist-dinero-out").value = "";
+                document.getElementById("asist-venta-caja").value = "";
+                document.getElementById("asist-dinero-propio-out").value = "";
+                dineroPropioEntradaGlobal = 0;
+                
+                logout();
+            } catch (e) {
+                alert("Error al procesar salida.");
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = "Registrar Salida y Enviar Reporte"; }
+            }
+        };
+
+        window.seleccionarMesa = function(idCasilla) {
+            mesaSeleccionada = idCasilla;
+            document.querySelectorAll('.mesa-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500/20', 'bg-amber-500/10', 'text-amber-500');
+                btn.classList.add('border-gray-800', 'bg-gray-950', 'text-gray-400');
+            });
+            const normalizedId = idCasilla.replace(" ", "-");
+            const activeMesaBtn = document.getElementById(`btn-mesa-${normalizedId}`);
+            if(activeMesaBtn) {
+                activeMesaBtn.classList.remove('border-gray-800', 'bg-gray-950', 'text-gray-400');
+                activeMesaBtn.classList.add('border-amber-500/20', 'bg-amber-500/10', 'text-amber-500');
+            }
+
+            document.getElementById("lbl-mesa-activa").innerText = idCasilla;
+            renderizarCarritoMesa();
+        };
+
+        window.agregarProductoAMesa = function() {
+            const select = document.getElementById("mesero-producto");
+            const producto = select.value;
+            const cantidad = parseInt(document.getElementById("mesero-cantidad").value) || 1;
+            const precio = parseFloat(select.options[select.selectedIndex].getAttribute("data-precio")) || 0;
+
+            if(cantidad <= 0) return;
+
+            comandasPorMesa[mesaSeleccionada].push({
+                producto: producto,
+                shadow: true,
+                cantidad: cantidad,
+                precio: precio,
+                subtotal: precio * cantidad
+            });
+
+            document.getElementById("mesero-cantidad").value = 1;
+            renderizarCarritoMesa();
+        };
+
+        window.removerProductoDeMesa = function(index) {
+            comandasPorMesa[mesaSeleccionada].splice(index, 1);
+            renderizarCarritoMesa();
+        };
+
+        function renderizarCarritoMesa() {
+            const contenedor = document.getElementById("lista-productos-mesa");
+            contenedor.innerHTML = "";
+            let totalAcumulado = 0;
+
+            comandasPorMesa[mesaSeleccionada].forEach((item, index) => {
+                totalAcumulado += item.subtotal;
+                const div = document.createElement("div");
+                div.className = "flex justify-between items-center bg-gray-900 p-2 rounded-lg border border-gray-800 text-gray-200";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-black text-amber-500">${item.cantidad}x</span> ${item.producto}
+                        <span class="text-gray-500 block text-[9px]">$${item.precio.toFixed(2)} c/u</span>
+                    </div>
+                    <div class="flex items-center gap-2 font-bold">
+                        <span>$${item.subtotal.toFixed(2)}</span>
+                        <button type="button" onclick="removerProductoDeMesa(${index})" class="text-rose-400 hover:text-rose-300 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                `;
+                contenedor.appendChild(div);
+            });
+
+            if(comandasPorMesa[mesaSeleccionada].length === 0) {
+                contenedor.innerHTML = `<span class="text-gray-600 block text-center py-2 italic">Sin artículos en esta casilla.</span>`;
+            }
+
+            document.getElementById("mesero-total-display").innerText = `$${totalAcumulado.toFixed(2)}`;
+            refrescarIconos();
+        }
+
+        window.registrarVentaMesero = async function(evt) {
+            const btn = evt?.currentTarget;
+            const listaProductos = comandasPorMesa[mesaSeleccionada];
+
+            if(listaProductos.length === 0) {
+                alert("❌ ERROR: No hay ningún producto agregado a la cuenta de esta casilla.");
+                return;
+            }
+
+            let totalCuenta = 0;
+            let resumenProductos = [];
+            listaProductos.forEach(item => {
+                totalCuenta += item.subtotal;
+                resumenProductos.push(`${item.cantidad}x ${item.producto}`);
+            });
+
+            const pago = document.querySelector('input[name="mesero-pago"]:checked').value;
+
+            try {
+                if (btn) { btn.disabled = true; btn.innerText = "⏳ Liquidando Cuenta..."; }
+                
+                await addDoc(collection(db, "finanzas"), {
+                    monto: totalCuenta,
+                    tipo: "Ingreso",
+                    concepto: `Comanda (${pago}) en ${mesaSeleccionada} por ${usuarioActivo || 'Desconocido'}: ${resumenProductos.join(', ')}`,
+                    fecha: new Date().getTime()
+                });
+
+                await addDoc(collection(db, "logs"), {
+                    fecha: new Date().toLocaleString("es-MX", { hour12: false }), 
+                    quien: usuarioActivo || "Desconocido",
+                    accion: `Cobro ${mesaSeleccionada} (${pago})`,
+                    evidencia: `Cuenta total cobrada: $${totalCuenta} | Detalles: ${resumenProductos.join(', ')}`,
+                    foto: "",
+                    alertaPropio: false
+                });
+
+                alert(`🎯 Cuenta de la ${mesaSeleccionada} cobrada con éxito por ${usuarioActivo}.`);
+                comandasPorMesa[mesaSeleccionada] = [];
+                renderizarCarritoMesa();
+            } catch (e) {
+                alert("Error al cargar y procesar la cuenta de la comanda.");
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = "🚀 Cobrar Cuenta e Inyectar a Caja"; }
+            }
+        };
+
+        const inputsInventario = [
+            'coronalight', 'modeloespecial', 'fanta', 'sidral', 'miranda', '7up', 'cocalata', 'cocatarosca', 'sangria', 'topochico', 'aguaembotellada', 'aguasabor', 
+            'bistec', 'suadero', 'chorizo', 'tripa', 'pastor', 'tmaiz', 'tharina', 
+            'bolsaagua', 'popote', 'asagrande', 'asachica', 'bolsajumbo', 'platoch', 'platogde', 'charolagde', 'vasogde', 'servilletas', 'aluminio', 'bolsasalsa',
+            'jabonmanos', 'jabonplatos', 'cloro', 'vinagre', 'aceitemanteca', 'azucar', 'sal', 'limon'
+        ];
+
+        window.guardarInventarioCompartido = async function(evt) {
+            const btn = evt?.currentTarget;
+            let datos = {};
+            inputsInventario.forEach(item => {
+                datos[item] = parseFloat(document.getElementById(`inv-${item}`).value) || 0;
+            });
+
+            try {
+                if (btn) { btn.disabled = true; btn.innerText = "⏳ Sincronizando Nube..."; }
+                await setDoc(doc(db, "inventario", "global"), datos);
+                await addDoc(collection(db, "logs"), {
+                    fecha: new Date().toLocaleString("es-MX", { hour12: false }),
+                    quien: usuarioActivo,
+                    accion: "Actualización de Inventario",
+                    evidencia: "Se actualizó el stock completo en la nube.",
+                    foto: "",
+                    alertaPropio: false
+                });
+                alert("☁️ Inventario Sincronizado para todo el negocio.");
+            } catch(e) {
+                alert("Error al guardar stock.");
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = "💾 Guardar Actualización Global"; }
+            }
+        };
+
+        window.guardarFinanzas = async function(evt) {
+            const btn = evt?.currentTarget;
+            const tipo = document.getElementById("caja-tipo").value;
+            const monto = parseFloat(document.getElementById("caja-monto").value) || 0;
+            const concepto = document.getElementById("caja-concepto").value.trim();
+
+            if (monto <= 0 || !concepto) {
+                alert("❌ Ingrese datos válidos (Monto y justificación obligatorios).");
+                return;
+            }
+
+            try {
+                if (btn) { btn.disabled = true; btn.innerText = "⏳ Registrando..."; }
+                await addDoc(collection(db, "finanzas"), {
+                    monto: monto,
+                    tipo: tipo,
+                    concepto: concepto,
+                    fecha: new Date().getTime()
+                });
+
+                await addDoc(collection(db, "logs"), {
+                    fecha: new Date().toLocaleString("es-MX", { hour12: false }),
+                    quien: usuarioActivo,
+                    accion: `Movimiento manual: ${tipo}`,
+                    evidencia: `$${monto} - Motivo: ${concepto}`,
+                    foto: "",
+                    alertaPropio: false
+                });
+
+                alert("💰 Flujo de caja asentado con éxito.");
+                document.getElementById("caja-monto").value = "";
+                document.getElementById("caja-concepto").value = "";
+            } catch(e) {
+                alert("Error en transacción.");
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = "Registrar en Caja"; }
+            }
+        };
+
+        window.enviarMensajeTexto = async function() {
+            const input = document.getElementById("chat-mensaje");
+            const txt = input.value.trim();
+            if(!txt) return;
+
+            await addDoc(collection(db, "chat"), {
+                remitente: usuarioActivo,
+                mensaje: txt,
+                tipo: "texto",
+                fecha: new Date().getTime()
+            });
+            input.value = "";
+        };
+
+        window.enviarAlertaAgotado = async function() {
+            const prod = document.getElementById("chat-producto-alerta").value;
+            await addDoc(collection(db, "chat"), {
+                remitente: usuarioActivo,
+                mensaje: `⚠️ ¡URGENTE! Se está agotando/terminó el insumo: ${prod}`,
+                tipo: "alerta",
+                fecha: new Date().getTime()
+            });
+        };
+
+        async function verificarYLimpiarMesCalendario() {
+            const mesActualStr = `${new Date().getMonth()}-${new Date().getFullYear()}`;
+            const configRef = doc(db, "configuracion", "calendario_estado");
+            
+            try {
+                const docSnap = await getDoc(configRef);
+                if (docSnap.exists()) {
+                    const ultimoMesGuardado = docSnap.data().ultimoMes;
+                    if (ultimoMesGuardado !== mesActualStr) {
+                        const snap = await getDocs(collection(db, "asistencia"));
+                        for (const documento of snap.docs) {
+                            await deleteDoc(doc(db, "asistencia", documento.id));
+                        }
+                        await setDoc(configRef, { ultimoMes: mesActualStr });
+                        console.log("📆 Nuevo mes detectado. El calendario ha sido reiniciado.");
+                    }
+                } else {
+                    await setDoc(configRef, { ultimoMes: mesActualStr });
+                }
+            } catch (e) {
+                console.error("Error validando el periodo del calendario: ", e);
+            }
+        }
+
+        function inicializarListenersRealtime() {
+            const qChat = query(collection(db, "chat"), orderBy("fecha", "asc"));
+            onSnapshot(qChat, (snapshot) => {
+                const cont = document.getElementById("chat-contenedor");
+                cont.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const div = document.createElement("div");
+                    div.className = data.tipo === 'alerta' ? 'p-2 bg-red-950/40 border border-red-500/30 rounded-xl text-red-300 font-bold' : 'p-2 bg-gray-900 border border-gray-800 rounded-xl';
+                    div.innerHTML = `<span class="text-amber-500 font-black">${data.remitente}:</span> <span>${data.mensaje}</span>`;
+                    cont.appendChild(div);
+                });
+                cont.scrollTop = cont.scrollHeight;
+            });
+
+            onSnapshot(doc(db, "inventario", "global"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    inputsInventario.forEach(item => {
+                        const inputElement = document.getElementById(`inv-${item}`);
+                        if (inputElement) {
+                            const valorStock = data[item] !== undefined ? parseFloat(data[item]) : 0;
+                            inputElement.value = valorStock;
+                            
+                            if(valorStock < 2) {
+                                inputElement.classList.add("stock-bajo");
+                            } else {
+                                inputElement.classList.remove("stock-bajo");
+                            }
+                        }
+                    });
+                }
+            });
+
+            if(usuarioActivo === "Jefe") {
+                const qLogs = query(collection(db, "logs"), orderBy("fecha", "desc"));
+                onSnapshot(qLogs, (snapshot) => {
+                    const tbody = document.getElementById("tabla-logs");
+                    tbody.innerHTML = "";
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const tr = document.createElement("tr");
+                        
+                        if (data.alertaPropio === true) {
+                            tr.className = "bg-rose-950/80 border border-rose-500 text-rose-100 hover:bg-rose-900/90 transition animate-pulse";
+                        } else {
+                            tr.className = "hover:bg-gray-900/50 transition";
+                        }
+
+                        tr.innerHTML = `
+                            <td class="p-2.5 text-gray-400 font-medium whitespace-nowrap ${data.alertaPropio ? 'text-rose-200 font-black':''}">${data.fecha}</td>
+                            <td class="p-2.5 font-bold ${data.alertaPropio ? 'text-white text-sm': 'text-white'}">${data.quien}</td>
+                            <td class="p-2.5 font-bold ${data.alertaPropio ? 'text-rose-300 underline':'text-amber-500'}">${data.accion}</td>
+                            <td class="p-2.5">
+                                <div class="${data.alertaPropio ? 'text-white font-bold':'text-gray-400'}">${data.evidencia}</div>
+                                ${data.foto ? `<img src="${data.foto}" class="w-16 h-12 rounded object-cover mt-1 border border-gray-700 hover:scale-300 transition-transform origin-left" alt="Evidencia">` : ""}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+
+                onSnapshot(collection(db, "finanzas"), (snapshot) => {
+                    let ingresos = 0;
+                    let egresos = 0;
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        if(d.tipo === "Ingreso") ingresos += d.monto;
+                        else if(d.tipo === "Egreso") egresos += d.monto;
+                    });
+                    document.getElementById("total-ingresos").innerText = `$${ingresos.toFixed(2)}`;
+                    document.getElementById("total-egresos").innerText = `$${egresos.toFixed(2)}`;
+                    document.getElementById("total-neto").innerText = `$${(ingresos - egresos).toFixed(2)}`;
+                });
+            }
+        }
+
+        function generarCalendarioLocal(idContenedor, marcados = []) {
+            const contenedor = document.getElementById(idContenedor);
+            contenedor.innerHTML = "";
+            
+            const diasSemana = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"];
+            diasSemana.forEach(diaLabel => {
+                const cabecera = document.createElement("div");
+                cabecera.innerText = diaLabel;
+                cabecera.className = "text-amber-500/80 font-black uppercase text-[10px] pb-1 border-b border-gray-800/40";
+                contenedor.appendChild(cabecera);
+            });
+
+            const diasMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+            for (let i = 1; i <= diasMes; i++) {
+                const elementoDia = document.createElement("div");
+                elementoDia.innerText = i;
+                elementoDia.className = "p-1 text-gray-400 border border-gray-900";
+                if(marcados.includes(i.toString())) {
+                    elementoDia.className = "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-md font-black p-1 text-[11px]";
+                }
+                contenedor.appendChild(elementoDia);
+            }
+        }
+
+        window.cargarCalendarioJefe = async function() {
+            const filtrado = document.getElementById("jefe-filtro-empleado").value;
+            try {
+                const snap = await getDocs(collection(db, "asistencia"));
+                let diasValidos = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if(d.usuario === filtrado) { diasValidos.push(d.dia); }
+                });
+                generarCalendarioLocal("calendario-jefe", diasValidos);
+            } catch (e) { console.error(e); }
+        };
+
+        window.ejecutarBorradoMaestro = async function() {
+            const claveIngresada = prompt("🔐 Introduzca la clave de Administrador para confirmar el vaciado completo:");
+            
+            if (claveIngresada !== "1234") {
+                alert("❌ Clave incorrecta. Acceso denegado al borrado maestro.");
+                return;
+            }
+
+            if(!confirm("⚠️ ¿ESTÁS COMPLETAMENTE SEGURO? Esto eliminará de forma irreversible logs, finanzas e hilos de chat.")) return;
+            
+            const colecciones = ["logs", "finanzas", "chat"];
+            for (const col of colecciones) {
+                const snap = await getDocs(collection(db, col));
+                for (const documento of snap.docs) {
+                    await deleteDoc(doc(db, col, documento.id));
+                }
+            }
+            alert("🧹 Sistema limpio y reseteado a ceros.");
+            location.reload();
+        };
+
+        refrescarIconos();
+    </script>
+</body>
+</html>
